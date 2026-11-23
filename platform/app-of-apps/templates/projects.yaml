@@ -1,0 +1,58 @@
+# Wave -1: AppProjects, created before any Application that references them.
+#
+# platform: cluster services. Trusted to create cluster-scoped resources
+#           (CRDs, GatewayClasses, webhooks) in any namespace.
+#
+# apps:     workloads. Only this repository, only the namespaces listed under
+#           destinations, and only the resource kinds listed below. A workload
+#           cannot install a CRD, touch the gateway, or deploy into argocd.
+apiVersion: argoproj.io/v1alpha1
+kind: AppProject
+metadata:
+  name: platform
+  namespace: argocd
+  annotations:
+    argocd.argoproj.io/sync-wave: "-1"
+spec:
+  description: Cluster services managed by the platform.
+  sourceRepos:
+    - {{ .Values.repoURL | quote }}
+    - {{ .Values.envoyGateway.repoURL | quote }}
+  destinations:
+    - server: https://kubernetes.default.svc
+      namespace: "*"
+  clusterResourceWhitelist:
+    - group: "*"
+      kind: "*"
+---
+apiVersion: argoproj.io/v1alpha1
+kind: AppProject
+metadata:
+  name: apps
+  namespace: argocd
+  annotations:
+    argocd.argoproj.io/sync-wave: "-1"
+spec:
+  description: Workloads. Namespaced resources only, in allowed namespaces.
+  sourceRepos:
+    - {{ .Values.repoURL | quote }}
+  destinations:
+    {{- range .Values.apps.namespaces }}
+    - server: https://kubernetes.default.svc
+      namespace: {{ . | quote }}
+    {{- end }}
+  # Namespace only, so CreateNamespace=true can create the destination namespace.
+  clusterResourceWhitelist:
+    - group: ""
+      kind: Namespace
+  namespaceResourceWhitelist:
+    - group: ""
+      kind: ConfigMap
+    - group: ""
+      kind: Service
+    - group: ""
+      kind: ServiceAccount
+    - group: apps
+      kind: Deployment
+    - group: gateway.networking.k8s.io
+      kind: HTTPRoute

@@ -1,0 +1,5 @@
+apiVersion: v2
+name: app-of-apps
+description: App-of-apps. Renders the platform and apps AppProjects and one Argo CD Application per component.
+type: application
+version: 0.1.0

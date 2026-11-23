@@ -1,0 +1,26 @@
+# Wave 0: Envoy Gateway controller, plus the Gateway API and Envoy Gateway CRDs
+# that its chart installs by default. Server-side apply avoids the annotation
+# size limit on the large CRDs.
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: envoy-gateway
+  namespace: argocd
+  annotations:
+    argocd.argoproj.io/sync-wave: "0"
+spec:
+  project: platform
+  source:
+    repoURL: {{ .Values.envoyGateway.repoURL | quote }}
+    chart: gateway-helm
+    targetRevision: {{ .Values.envoyGateway.version | quote }}
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: envoy-gateway-system
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - CreateNamespace=true
+      - ServerSideApply=true

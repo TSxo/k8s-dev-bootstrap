@@ -1,0 +1,14 @@
+# Git source for the child Applications that live in this repository.
+# Set by the root Application (bootstrap/root-app.yaml).
+repoURL: https://github.com/TSxo/k8s-dev-bootstrap.git
+revision: main
+
+envoyGateway:
+  # Helm chart oci://docker.io/envoyproxy/gateway-helm
+  repoURL: docker.io/envoyproxy
+  version: v1.10.0
+
+apps:
+  # Namespaces the `apps` AppProject may deploy to.
+  namespaces:
+    - demo

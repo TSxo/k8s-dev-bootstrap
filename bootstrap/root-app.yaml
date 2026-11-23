@@ -1,0 +1,27 @@
+# The root of the app-of-apps. It renders platform/app-of-apps (a small Helm
+# chart), which creates the AppProjects and one child Application per component.
+#
+# `just argo-bootstrap <revision>` rewrites repoURL, targetRevision and revision
+# before applying, so CI can sync the commit under test.
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: root
+  namespace: argocd
+spec:
+  project: default
+  source:
+    repoURL: https://github.com/TSxo/k8s-dev-bootstrap.git
+    targetRevision: main
+    path: platform/app-of-apps
+    helm:
+      valuesObject:
+        repoURL: https://github.com/TSxo/k8s-dev-bootstrap.git
+        revision: main
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: argocd
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
