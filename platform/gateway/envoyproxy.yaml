@@ -1,0 +1,21 @@
+# Expose Envoy on a fixed NodePort, which bootstrap/kind-config.yaml publishes on
+# 127.0.0.1:8080. A LoadBalancer Service (the default) would need a load
+# balancer implementation that Kind does not ship.
+apiVersion: gateway.envoyproxy.io/v1alpha1
+kind: EnvoyProxy
+metadata:
+  name: kind-nodeport
+  namespace: envoy-gateway-system
+spec:
+  provider:
+    type: Kubernetes
+    kubernetes:
+      envoyService:
+        type: NodePort
+        patch:
+          type: StrategicMerge
+          value:
+            spec:
+              ports:
+                - port: 80
+                  nodePort: 30080

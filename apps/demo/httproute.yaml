@@ -1,0 +1,16 @@
+# Demo app at http://demo.localhost:8080.
+apiVersion: gateway.networking.k8s.io/v1
+kind: HTTPRoute
+metadata:
+  name: whoami
+  namespace: demo
+spec:
+  parentRefs:
+    - name: eg
+      namespace: envoy-gateway-system
+  hostnames:
+    - demo.localhost
+  rules:
+    - backendRefs:
+        - name: whoami
+          port: 80

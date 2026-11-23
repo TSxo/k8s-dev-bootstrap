@@ -1,0 +1,15 @@
+# Argo CD, pinned to a release tag.
+#
+# Apply with server-side apply: some Argo CD CRDs exceed the annotation size
+# limit of client-side apply.
+#
+#   kubectl apply --server-side --force-conflicts -k bootstrap/argocd
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+namespace: argocd
+resources:
+  - namespace.yaml
+  - https://raw.githubusercontent.com/argoproj/argo-cd/v3.6.2/manifests/install.yaml
+patches:
+  - path: argocd-cmd-params-cm.yaml
+  - path: argocd-cm.yaml
